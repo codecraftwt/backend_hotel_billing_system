@@ -17,7 +17,7 @@ const port = process.env.PORT || 3000;
 const server = http.createServer(app);
 const io = new SocketIOServer(server, {
   cors: {
-    origin: process.env.CORS_ORIGIN, // Allow Angular frontend
+    origin: '*', // Allow Angular frontend
     methods: ['GET', 'POST','PUT','PATCH'],
     credentials: true // Allow credentials (cookies, HTTP authentication)
   }
@@ -25,7 +25,7 @@ const io = new SocketIOServer(server, {
 
 // Middleware to handle CORS
 app.use(cors({
-  origin: process.env.CORS_ORIGIN, // Allow requests from Angular frontend
+  origin: "*", // Allow requests from Angular frontend
   methods: ['GET', 'POST','PUT','PATCH'],
   credentials: true // Allow credentials (cookies, HTTP authentication)
 }));
