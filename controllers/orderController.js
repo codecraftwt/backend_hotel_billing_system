@@ -11,7 +11,7 @@ export const createOrUpdateOrder = async (req, res) => {
             return res.status(404).json({ message: 'Food item not found' });
         }
 
-        const { name: foodItemName, price: itemPrice } = foodItem;
+        const { name: foodItemName, price: itemPrice,img:img } = foodItem;
         const quantity = 1;
 
         // Fetch the existing order for the given table number and status 'processing'
@@ -32,6 +32,7 @@ export const createOrUpdateOrder = async (req, res) => {
                     foodItemName,
                     quantity,
                     itemPrice,
+                    img,
                     quantityWithPrice: quantity * itemPrice
                 });
             }
@@ -48,6 +49,7 @@ export const createOrUpdateOrder = async (req, res) => {
                     foodItemName,
                     quantity,
                     itemPrice,
+                    img,
                     quantityWithPrice: quantity * itemPrice
                 }]
             });

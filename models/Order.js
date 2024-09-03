@@ -5,6 +5,7 @@ const foodItemSchema = new mongoose.Schema({
     foodItemName: { type: String, required: true },
     quantity: { type: Number, default: 1 },
     itemPrice: { type: Number, required: true },
+    img:{type:String,required:true},
     quantityWithPrice: { type: Number, default: function() { return this.quantity * this.itemPrice; } },
     status: { type: String, default: 'on hold', enum: ['on hold', 'working', 'ready'] }
 });

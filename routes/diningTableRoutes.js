@@ -4,6 +4,7 @@ import { createCategory, getAllCategories } from '../controllers/foodCategoryCon
 import { createFoodItem, getAllFoodItems, getFoodItemsByCategoryId } from '../controllers/foodItemController.js';
 import { addCustomerName, createOrUpdateOrder, deleteFoodItem, getAllOrders, getAllOrdersAdmin, getOrderByTableNo, updateDiscountPercent, updateFoodItemQuantity, updateFoodItemStatus, updateOrderStatus, updatePaymentType } from '../controllers/orderController.js';
 import { createOrUpdateStatus, getStatusByTableNo } from '../controllers/statusController.js';
+import upload from '../config/multer.js';
 const router = express.Router();
 
 // Route to create multiple dining tables
@@ -18,7 +19,7 @@ router.post('/foodCategory',createCategory)
 
 router.get('/foodItems',getAllFoodItems)
 router.get('/foodItems/:id',getFoodItemsByCategoryId)
-router.post('/foodItems',createFoodItem)
+router.post('/foodItems',upload.single('image'),createFoodItem)
 
 
 router.post('/orders', createOrUpdateOrder);

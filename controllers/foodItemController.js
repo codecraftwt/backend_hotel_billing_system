@@ -1,3 +1,4 @@
+import cloudinary from "../config/cloudinary.js";
 import FoodCategory from "../models/FoodCategory.js";
 import FoodItem from "../models/FoodItem.js";
 
@@ -31,38 +32,80 @@ export const getFoodItemsByCategoryId = async (req, res) => {
     }
 };
 
-export const createFoodItem = async (req, res) => {
-    const { name, category, price } = req.body;
+// export const createFoodItem = async (req, res) => {
+//     const { name, category, price } = req.body;
 
+//     try {
+//         // Find the category by name
+//         const categoryDoc = await FoodCategory.findOne({ name: category });
+//         if (!categoryDoc) {
+//             return res.status(400).json({ message: 'Category not found' });
+//         }
+
+//         // Create the new food item using the category ID
+//         // const newFoodItem = new FoodItem({
+//         //     name,
+//         //     category: categoryDoc._id,
+//         //     price,
+//         // });
+//         await FoodItem.insertMany({
+//             name,
+//             category: categoryDoc._id,
+//             price,
+
+//         })
+//         // await newFoodItem.save();
+//         const updatedFoodItems=await FoodItem.find();
+
+
+//         // Emit the new food item to all connected clients
+//         req.io.emit('newFoodItem', updatedFoodItems);
+
+//         res.status(201).json(updatedFoodItems);
+//     } catch (error) {
+//         res.status(400).json({ message: error.message });
+//     }
+// };
+
+
+export const createFoodItem = async (req, res) => {
+    const { name, category, price, type } = req.body;
+    const image = req.file; // Assuming the image field name is 'image'
+    console.log(category,'category');
+    
     try {
         // Find the category by name
-        const categoryDoc = await FoodCategory.findOne({ name: category });
+        const categoryDoc = await FoodCategory.findOne({ _id: category });
         if (!categoryDoc) {
             return res.status(400).json({ message: 'Category not found' });
         }
 
-        // Create the new food item using the category ID
-        // const newFoodItem = new FoodItem({
-        //     name,
-        //     category: categoryDoc._id,
-        //     price,
-        // });
-        await FoodItem.insertMany({
+        // Upload the image to Cloudinary if provided
+        let imgUrl = null;
+        if (image) {
+            const result = await cloudinary.uploader.upload(image.path);
+            imgUrl = result.secure_url;
+        }
+
+        // Create the new food item using the category ID and image URL
+        const newFoodItem = new FoodItem({
             name,
             category: categoryDoc._id,
             price,
+            img: imgUrl,
+            type,
+        });
 
-        })
-        // await newFoodItem.save();
-        const updatedFoodItems=await FoodItem.find();
-
+        await newFoodItem.save();
+        const updatedFoodItems = await FoodItem.find();
 
         // Emit the new food item to all connected clients
-        req.io.emit('newFoodItem', updatedFoodItems);
+        if (req.io) {
+            req.io.emit('newFoodItem', updatedFoodItems);
+        }
 
         res.status(201).json(updatedFoodItems);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 };
-
