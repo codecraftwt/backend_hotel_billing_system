@@ -22,6 +22,11 @@ const FoodItems = new mongoose.Schema({
         type: String,
         default: null,
     },
+    shortcode: {
+        type: String,
+        // You can set a default value or add validation if needed
+        default: null,
+    }
 });
 
 const FoodItem = mongoose.model('FoodItem', FoodItems);

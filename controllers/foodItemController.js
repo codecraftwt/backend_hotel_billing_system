@@ -69,7 +69,7 @@ export const getFoodItemsByCategoryId = async (req, res) => {
 
 
 export const createFoodItem = async (req, res) => {
-    const { name, category, price, type } = req.body;
+    const { name, category, price, type,shortcode } = req.body;
     const image = req.file; // Assuming the image field name is 'image'
     console.log(category,'category');
     
@@ -94,6 +94,7 @@ export const createFoodItem = async (req, res) => {
             price,
             img: imgUrl,
             type,
+            shortcode
         });
 
         await newFoodItem.save();
