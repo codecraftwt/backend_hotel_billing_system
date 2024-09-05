@@ -9,7 +9,9 @@ const foodItemSchema = new mongoose.Schema({
     quantityWithPrice: { type: Number, default: function() { return this.quantity * this.itemPrice; } },
     status: { type: String, default: 'on hold', enum: ['on hold', 'working', 'ready'] },
     type:{ type: String,default: null},
-    orderNote: { type: String, default: '' } 
+    orderNote: { type: String, default: '' },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now } 
 });
 
 const orderSchema = new mongoose.Schema({

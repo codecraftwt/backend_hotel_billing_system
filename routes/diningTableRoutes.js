@@ -1,5 +1,5 @@
 import express from 'express';
-import {getDiningTables, updateTables, updateTableWithOrder } from '../controllers/diningTableController.js';
+import {getDiningTables, updateTables, updateTableStatus, updateTableWithOrder } from '../controllers/diningTableController.js';
 import { createCategory, getAllCategories } from '../controllers/foodCategoryController.js';
 import { createFoodItem, getAllFoodItems, getFoodItemsByCategoryId } from '../controllers/foodItemController.js';
 import { addCustomerName, createOrUpdateOrder, deleteFoodItem, getAllOrders, getAllOrdersAdmin, getOrderByTableNo, updateDiscountPercent, updateFoodItemQuantity, updateFoodItemStatus, updateOrderKotStatus, updateOrderNote, updateOrderStatus, updatePaymentType } from '../controllers/orderController.js';
@@ -13,6 +13,7 @@ router.post('/dining-tables', updateTables);
 // Route to get all dining tables
 router.get('/dining-tables', getDiningTables);
 router.put('/tables/:tableNumber', updateTableWithOrder);
+router.patch('/tables/:tableNumber/status', updateTableStatus);
 
 router.get('/foodCategory',getAllCategories)
 router.post('/foodCategory',createCategory)

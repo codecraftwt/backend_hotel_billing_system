@@ -30,17 +30,18 @@ export const getDiningTables = async (req, res) => {
       // Check if there's an associated order
       if (table.order) {
         // Only include tables with an order that has status 'processing'
-        if (table.order.orderStatus === 'processing') {
+        if (table.order.orderStatus === 'processing' && table.order.kotStatus=="confirmed") {
           return {
             _id: table._id,
             tableNumber: table.tableNumber,
             capacity: table.capacity,
             status: table.status,
-            order: {
-              _id: table.order._id,
-              totalPrice: table.order.totalPrice,
-              orderStatus: table.order.orderStatus
-            }
+            // order: {
+            //   _id: table.order._id,
+            //   totalPrice: table.order.totalPrice,
+            //   orderStatus: table.order.orderStatus
+            // }
+            order:table.order
           };
         }
       }
@@ -100,4 +101,33 @@ export const updateTableWithOrder = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+export const updateTableStatus=async (req,res)=>{
+  const { tableNumber } = req.params;
+  const { status } = req.body;
+  
+  if (!status) {
+    return res.status(400).send('Status is required');
+  }
+
+  try {
+    const diningTable = await DiningTable.findOneAndUpdate(
+      { tableNumber: tableNumber },
+      { status: status },
+      { new: true, runValidators: true }
+    );
+
+    if (!diningTable) {
+      return res.status(404).send('Dining table not found');
+    }
+
+    // res.status(200).json(diningTable);
+    const updatedTables = await DiningTable.find();
+    req.io.emit('updateTables', updatedTables);
+    res.status(201).json(updatedTables);
+  } catch (error) {
+    res.status(500).send('Server error');
+  }
+
+}
 

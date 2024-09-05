@@ -25,6 +25,7 @@ export const createOrUpdateOrder = async (req, res) => {
                 // Update quantity and price for existing food item
                 order.ordersList[existingItemIndex].quantity += quantity;
                 order.ordersList[existingItemIndex].quantityWithPrice = order.ordersList[existingItemIndex].quantity * order.ordersList[existingItemIndex].itemPrice;
+                order.ordersList[existingItemIndex].updatedAt = Date.now(); // Update timestamp
             } else {
                 // Add new food item to the order
                 order.ordersList.push({
@@ -34,7 +35,9 @@ export const createOrUpdateOrder = async (req, res) => {
                     itemPrice,
                     img,
                     type,
-                    quantityWithPrice: quantity * itemPrice
+                    quantityWithPrice: quantity * itemPrice,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
                 });
             }
 
@@ -52,7 +55,9 @@ export const createOrUpdateOrder = async (req, res) => {
                     itemPrice,
                     img,
                     type,
-                    quantityWithPrice: quantity * itemPrice
+                    quantityWithPrice: quantity * itemPrice,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
                 }]
             });
             await newOrder.save();
@@ -112,7 +117,7 @@ export const updateFoodItemQuantity = async (req, res) => {
             // Update the quantity and quantityWithPrice
             order.ordersList[existingItemIndex].quantity = quantity;
             order.ordersList[existingItemIndex].quantityWithPrice = quantity * order.ordersList[existingItemIndex].itemPrice;
-
+            order.ordersList[existingItemIndex].updatedAt = Date.now();
             // Save the updated order
             await order.save();
 
@@ -375,7 +380,7 @@ export const updateOrderNote = async (req, res) => {
         if (existingItemIndex >= 0) {
             // Update the quantity and quantityWithPrice
             order.ordersList[existingItemIndex].orderNote = orderNote;
-
+            order.ordersList[existingItemIndex].updatedAt = Date.now();
             // Save the updated order
             await order.save();
 
