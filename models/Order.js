@@ -5,8 +5,13 @@ const foodItemSchema = new mongoose.Schema({
     foodItemName: { type: String, required: true },
     quantity: { type: Number, default: 1 },
     itemPrice: { type: Number, required: true },
+    img:{type:String,required:true},
     quantityWithPrice: { type: Number, default: function() { return this.quantity * this.itemPrice; } },
-    status: { type: String, default: 'on hold', enum: ['on hold', 'working', 'ready'] }
+    status: { type: String, default: 'on hold', enum: ['on hold', 'working', 'ready'] },
+    type:{ type: String,default: null},
+    orderNote: { type: String, default: '' },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now } 
 });
 
 const orderSchema = new mongoose.Schema({
@@ -17,7 +22,8 @@ const orderSchema = new mongoose.Schema({
     discountPercent: { type: Number, default: 0 }, // New field for discount percentage
     afterDiscountPrice: { type: Number, default: 0 }, // New field for price after discount
     paymentType: { type: String, default: null }, // New field for payment type
-    orderStatus: { type: String, default: 'processing', enum: ['processing', 'completed'] } // New field
+    orderStatus: { type: String, default: 'processing', enum: ['processing', 'completed'] }, // New field
+    kotStatus: { type: String, default: null, enum: ['null', 'confirmed'] } // Added kotStatus field
 });
 
 // Calculate total price before saving

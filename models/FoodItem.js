@@ -1,5 +1,6 @@
-import mongoose from "mongoose";
-const FoodItems=new mongoose.Schema({
+import mongoose from 'mongoose';
+
+const FoodItems = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -13,7 +14,20 @@ const FoodItems=new mongoose.Schema({
         type: Number,
         required: true,
     },
-})
+    img: {
+        type: String,
+        // You can set a default value for img if needed
+    },
+    type: {
+        type: String,
+        default: null,
+    },
+    shortcode: {
+        type: String,
+        // You can set a default value or add validation if needed
+        default: null,
+    }
+});
 
-const FoodItem=mongoose.model('FoodItem',FoodItems)
-export default FoodItem
+const FoodItem = mongoose.model('FoodItem', FoodItems);
+export default FoodItem;

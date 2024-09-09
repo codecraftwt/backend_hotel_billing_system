@@ -11,7 +11,7 @@ export const createOrUpdateOrder = async (req, res) => {
             return res.status(404).json({ message: 'Food item not found' });
         }
 
-        const { name: foodItemName, price: itemPrice } = foodItem;
+        const { name: foodItemName, price: itemPrice,img:img ,type:type} = foodItem;
         const quantity = 1;
 
         // Fetch the existing order for the given table number and status 'processing'
@@ -25,6 +25,7 @@ export const createOrUpdateOrder = async (req, res) => {
                 // Update quantity and price for existing food item
                 order.ordersList[existingItemIndex].quantity += quantity;
                 order.ordersList[existingItemIndex].quantityWithPrice = order.ordersList[existingItemIndex].quantity * order.ordersList[existingItemIndex].itemPrice;
+                order.ordersList[existingItemIndex].updatedAt = Date.now(); // Update timestamp
             } else {
                 // Add new food item to the order
                 order.ordersList.push({
@@ -32,7 +33,11 @@ export const createOrUpdateOrder = async (req, res) => {
                     foodItemName,
                     quantity,
                     itemPrice,
-                    quantityWithPrice: quantity * itemPrice
+                    img,
+                    type,
+                    quantityWithPrice: quantity * itemPrice,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
                 });
             }
 
@@ -48,7 +53,11 @@ export const createOrUpdateOrder = async (req, res) => {
                     foodItemName,
                     quantity,
                     itemPrice,
-                    quantityWithPrice: quantity * itemPrice
+                    img,
+                    type,
+                    quantityWithPrice: quantity * itemPrice,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
                 }]
             });
             await newOrder.save();
@@ -108,7 +117,7 @@ export const updateFoodItemQuantity = async (req, res) => {
             // Update the quantity and quantityWithPrice
             order.ordersList[existingItemIndex].quantity = quantity;
             order.ordersList[existingItemIndex].quantityWithPrice = quantity * order.ordersList[existingItemIndex].itemPrice;
-
+            order.ordersList[existingItemIndex].updatedAt = Date.now();
             // Save the updated order
             await order.save();
 
@@ -207,7 +216,7 @@ export const updateFoodItemStatus = async (req, res) => {
 export const getAllOrders = async (req, res) => {
     try {
         // const orders = await Order.find();
-        const orders = await Order.find({orderStatus:'processing'});
+        const orders = await Order.find({orderStatus:'processing',kotStatus:'confirmed'});
         res.status(200).json(orders);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -324,6 +333,65 @@ export const updateOrderStatus = async (req, res) => {
         res.status(200).json(order);
     } catch (error) {
         // Handle any errors
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const updateOrderKotStatus = async (req, res) => {
+    const { tableNo, newKotStatus } = req.body;
+
+    // Validate the new kotStatus
+    if (!['null', 'confirmed'].includes(newKotStatus)) {
+        return res.status(400).json({ message: 'Invalid kotStatus value' });
+    }
+    try {
+        // Find the order by table number and ensure it is in a valid state
+        const order = await Order.findOne({ tableNo, orderStatus: 'processing' });
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+        // Update the kotStatus
+        order.kotStatus = newKotStatus;
+        // Save the updated order
+        await order.save();
+        // Emit the updated order to clients
+        req.io.emit('orderUpdated', order);
+        // Return the updated order
+        res.status(200).json(order);
+    } catch (error) {
+        // Handle any errors
+        res.status(400).json({ message: error.message });
+    }
+};
+export const updateOrderNote = async (req, res) => {
+    const { tableNo, foodItemId, orderNote } = req.body;
+
+    try {
+        // Find the order for the given tableNo
+        let order = await Order.findOne({ tableNo, orderStatus:'processing' });
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        // Find the index of the food item in the ordersList
+        const existingItemIndex = order.ordersList.findIndex(item => item.foodItemId.toString() === foodItemId);
+
+        if (existingItemIndex >= 0) {
+            // Update the quantity and quantityWithPrice
+            order.ordersList[existingItemIndex].orderNote = orderNote;
+            order.ordersList[existingItemIndex].updatedAt = Date.now();
+            // Save the updated order
+            await order.save();
+
+            // Emit the updated order to clients
+            req.io.emit('orderUpdated', order);
+
+            res.status(200).json(order);
+        } else {
+            res.status(404).json({ message: 'Food item not found in the order' });
+        }
+    } catch (error) {
         res.status(400).json({ message: error.message });
     }
 };
