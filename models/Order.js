@@ -24,7 +24,7 @@ const orderSchema = new mongoose.Schema({
     paymentType: { type: String, default: null }, // New field for payment type
     orderStatus: { type: String, default: 'processing', enum: ['processing', 'completed'] }, // New field
     kotStatus: { type: String, default: null, enum: ['null', 'confirmed'] } // Added kotStatus field
-});
+},{ timestamps: true });
 
 // Calculate total price before saving
 orderSchema.pre('save', function(next) {

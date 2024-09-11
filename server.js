@@ -6,7 +6,7 @@ import { Server as SocketIOServer } from 'socket.io';
 import cors from 'cors'; // Import cors package
 import connectDB from './config/db.js';
 import dotenv from 'dotenv';
-
+import * as faceRecognitionService from './services/faceRecognitionService.js';
 // Load environment variables from .env file
 dotenv.config();
 
@@ -47,6 +47,24 @@ app.use('/api', router);
 // Socket.IO connection
 io.on('connection', (socket) => {
   console.log('A user connected');
+  socket.on('signup', async (data) => {
+    const { username, photo } = data;
+    const result = await faceRecognitionService.signup(username, photo);
+    socket.emit('signupResponse', result);
+  });
+
+  socket.on('login', async (data) => {
+    const { photo } = data;
+    const result = await faceRecognitionService.login(photo);
+    socket.emit('loginResponse', result);
+  });
+
+  socket.on('logout', async (data) => {
+    const { photo } = data;
+    const result = await faceRecognitionService.logout(photo);
+    socket.emit('logoutResponse', result);
+  });
+  
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });

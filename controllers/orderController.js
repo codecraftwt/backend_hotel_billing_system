@@ -1,3 +1,4 @@
+import moment from "moment";
 import FoodItem from "../models/FoodItem.js";
 import Order from "../models/Order.js";
 
@@ -455,15 +456,242 @@ export const getAllOrders = async (req, res) => {
     }
 };
 // Get all orders admin only
+// export const getAllOrdersAdmin = async (req, res) => {
+//     try {
+//         // const orders = await Order.find();
+//         const orders = await Order.find();
+//         res.status(200).json(orders);
+//     } catch (error) {
+//         res.status(500).json({ message: error.message });
+//     }
+// };
+
 export const getAllOrdersAdmin = async (req, res) => {
     try {
-        // const orders = await Order.find();
+        // Fetch all orders
         const orders = await Order.find();
-        res.status(200).json(orders);
+
+        // Helper functions
+        const getMonthlyData = (start, end) => {
+            return orders.filter(order => 
+                new Date(order.createdAt) >= start && new Date(order.createdAt) <= end
+            );
+        };
+
+        const getPercentageChange = (current, previous) => {
+            if (previous === 0) return 100; // Avoid division by zero
+            return ((current - previous) / previous) * 100;
+        };
+
+        const getTotalRevenue = (orders) => orders.reduce((sum, order) => sum + order.afterDiscountPrice, 0);
+
+        // Date calculations
+        const currentDate = moment();
+        const startOfMonth = currentDate.startOf('month').toDate();
+        const endOfMonth = currentDate.endOf('month').toDate(); // Ensure you get the end date of the current month
+        
+        // Ensure you are correctly setting the start and end dates of last month
+        const startOfLastMonth = moment().subtract(1, 'month').startOf('month').toDate();
+        const endOfLastMonth = moment().subtract(1, 'month').endOf('month').toDate();
+
+        // Calculate total orders count
+        const totalOrders = orders.length;
+        const thisMonthOrders = getMonthlyData(startOfMonth, endOfMonth).length;
+        const lastMonthOrders = getMonthlyData(startOfLastMonth, endOfLastMonth).length;
+        const orderCountPercentage = getPercentageChange(thisMonthOrders, lastMonthOrders);
+
+        // Calculate revenue
+        const thisMonthRevenue = getTotalRevenue(getMonthlyData(startOfMonth, endOfMonth));
+        const lastMonthRevenue = getTotalRevenue(getMonthlyData(startOfLastMonth, endOfLastMonth));
+        const revenuePercentage = getPercentageChange(thisMonthRevenue, lastMonthRevenue);
+
+        // Calculate average order value
+        const averageOrderValue = (total, count) => count === 0 ? 0 : total / count;
+        const avgOrderValueThisMonth = averageOrderValue(thisMonthRevenue, thisMonthOrders);
+        const avgOrderValueLastMonth = averageOrderValue(lastMonthRevenue, lastMonthOrders);
+        const avgOrderValuePercentage = getPercentageChange(avgOrderValueThisMonth, avgOrderValueLastMonth);
+
+        // Customer satisfaction is assumed to be static for simplicity
+        const customerSatisfaction = 4.5;
+        const satisfactionPercentage = 0; // Placeholder
+
+        // Get recent orders (top 5)
+        const recentOrders = orders
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 5);
+
+        // Calculate popular menu items
+        const menuItemCounts = orders.reduce((acc, order) => {
+            order.ordersList.forEach(item => {
+                acc[item.foodItemName] = (acc[item.foodItemName] || 0) + 1;
+            });
+            return acc;
+        }, {});
+
+        // Transform menu item counts to an array of objects
+        const popularMenuItemsArray = Object.entries(menuItemCounts).map(([foodItemName, count]) => ({
+            label: foodItemName,
+            value: count
+        }));
+
+        // Sort the array by count in descending order and get the top 5
+        const top5PopularMenuItems = popularMenuItemsArray
+            .sort((a, b) => b.value - a.value)
+            .slice(0, 5);
+
+        // Send response with analytics
+        res.status(200).json({
+            totalOrders: {
+                count: totalOrders,
+                thisMonth: thisMonthOrders,
+                lastMonth: lastMonthOrders,
+                percentageChange: orderCountPercentage
+            },
+            revenue: {
+                thisMonth: thisMonthRevenue,
+                lastMonth: lastMonthRevenue,
+                percentageChange: revenuePercentage
+            },
+            averageOrderValue: {
+                thisMonth: avgOrderValueThisMonth,
+                lastMonth: avgOrderValueLastMonth,
+                percentageChange: avgOrderValuePercentage
+            },
+            customerSatisfaction: {
+                rating: customerSatisfaction,
+                percentageChange: satisfactionPercentage
+            },
+            recentOrders,
+            popularMenuItems: top5PopularMenuItems,
+            // Financial Insights are not implemented in this example
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
+// export const getAllOrdersAdmin = async (req, res) => {
+//     try {
+//         // Fetch all orders
+//         const orders = await Order.find();
+
+//         // Fetch all expenses
+//         const expenses = await Expense.find();
+
+//         // Helper functions
+//         const getMonthlyData = (start, end) => {
+//             return orders.filter(order => 
+//                 new Date(order.createdAt) >= start && new Date(order.createdAt) <= end
+//             );
+//         };
+
+//         const getDailyData = (start, end) => {
+//             return orders.filter(order => 
+//                 new Date(order.createdAt).toDateString() === new Date(start).toDateString()
+//             );
+//         };
+
+//         const getPercentageChange = (current, previous) => {
+//             if (previous === 0) return 100; // Avoid division by zero
+//             return ((current - previous) / previous) * 100;
+//         };
+
+//         const getTotalRevenue = (orders) => orders.reduce((sum, order) => sum + order.afterDiscountPrice, 0);
+
+//         // Date calculations
+//         const currentDate = moment();
+//         const startOfMonth = currentDate.startOf('month').toDate();
+//         const endOfMonth = currentDate.endOf('month').toDate();
+
+//         // Last month calculations
+//         const startOfLastMonth = moment().subtract(1, 'month').startOf('month').toDate();
+//         const endOfLastMonth = moment().subtract(1, 'month').endOf('month').toDate();
+
+//         // Daily revenue
+//         const dailyRevenues = {};
+//         for (let day = startOfMonth; day <= endOfMonth; day = moment(day).add(1, 'day').toDate()) {
+//             dailyRevenues[day.toDateString()] = getTotalRevenue(getDailyData(day, day));
+//         }
+
+//         // Monthly expenses
+//         const monthlyExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+
+//         // Calculate total orders count
+//         const totalOrders = orders.length;
+//         const thisMonthOrders = getMonthlyData(startOfMonth, endOfMonth).length;
+//         const lastMonthOrders = getMonthlyData(startOfLastMonth, endOfLastMonth).length;
+//         const orderCountPercentage = getPercentageChange(thisMonthOrders, lastMonthOrders);
+
+//         // Calculate revenue
+//         const thisMonthRevenue = getTotalRevenue(getMonthlyData(startOfMonth, endOfMonth));
+//         const lastMonthRevenue = getTotalRevenue(getMonthlyData(startOfLastMonth, endOfLastMonth));
+//         const revenuePercentage = getPercentageChange(thisMonthRevenue, lastMonthRevenue);
+
+//         // Calculate average order value
+//         const averageOrderValue = (total, count) => count === 0 ? 0 : total / count;
+//         const avgOrderValueThisMonth = averageOrderValue(thisMonthRevenue, thisMonthOrders);
+//         const avgOrderValueLastMonth = averageOrderValue(lastMonthRevenue, lastMonthOrders);
+//         const avgOrderValuePercentage = getPercentageChange(avgOrderValueThisMonth, avgOrderValueLastMonth);
+
+//         // Calculate profit margin
+//         const profitMargin = (thisMonthRevenue - monthlyExpenses) / thisMonthRevenue * 100;
+
+//         // Average table turnover calculation
+//         // Placeholder example; assuming each order represents a table's turnover time
+//         const averageTableTurnover = totalOrders > 0 ? (moment().diff(moment.min(...orders.map(order => moment(order.createdAt))), 'minutes') / totalOrders) : 0;
+
+//         // Customer satisfaction is assumed to be static for simplicity
+//         const customerSatisfaction = 4.5;
+//         const satisfactionPercentage = 0; // Placeholder
+
+//         // Get recent orders (top 5)
+//         const recentOrders = orders
+//             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+//             .slice(0, 5);
+
+//         // Calculate popular menu items
+//         const menuItemCounts = orders.reduce((acc, order) => {
+//             order.ordersList.forEach(item => {
+//                 acc[item.foodItemName] = (acc[item.foodItemName] || 0) + 1;
+//             });
+//             return acc;
+//         }, {});
+
+//         // Send response with analytics
+//         res.status(200).json({
+//             totalOrders: {
+//                 count: totalOrders,
+//                 thisMonth: thisMonthOrders,
+//                 lastMonth: lastMonthOrders,
+//                 percentageChange: orderCountPercentage
+//             },
+//             revenue: {
+//                 thisMonth: thisMonthRevenue,
+//                 lastMonth: lastMonthRevenue,
+//                 percentageChange: revenuePercentage,
+//                 dailyRevenues
+//             },
+//             averageOrderValue: {
+//                 thisMonth: avgOrderValueThisMonth,
+//                 lastMonth: avgOrderValueLastMonth,
+//                 percentageChange: avgOrderValuePercentage
+//             },
+//             customerSatisfaction: {
+//                 rating: customerSatisfaction,
+//                 percentageChange: satisfactionPercentage
+//             },
+//             recentOrders,
+//             popularMenuItems: menuItemCounts,
+//             financialInsights: {
+//                 monthlyExpenses: monthlyExpenses,
+//                 profitMargin: profitMargin,
+//                 averageTableTurnover: averageTableTurnover
+//             }
+//         });
+//     } catch (error) {
+//         res.status(500).json({ message: error.message });
+//     }
+// };
 
 // New API to update discount percentage
 export const updateDiscountPercent = async (req, res) => {
