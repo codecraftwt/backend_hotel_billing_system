@@ -39,7 +39,9 @@ app.use((req, res, next) => {
 // Connect to MongoDB
 connectDB()
 // Middleware
-app.use(express.json());
+// app.use(express.json());
+app.use(express.json({ limit: '50mb' })); // Adjust the limit as needed
+app.use(express.urlencoded({ extended: true, limit: '50mb' })); // For URL-encoded data
 
 // Routes
 app.use('/api', router);

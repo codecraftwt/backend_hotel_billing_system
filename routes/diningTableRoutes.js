@@ -5,7 +5,10 @@ import { createFoodItem, getAllFoodItems, getFoodItemsByCategoryId } from '../co
 import { addCustomerName, createOrUpdateOrder, deleteFoodItem, getAllOrders, getAllOrdersAdmin, getOrderByTableNo, updateDiscountPercent, updateFoodItemQuantity, updateFoodItemStatus, updateOrderKotStatus, updateOrderNote, updateOrderStatus, updatePaymentType } from '../controllers/orderController.js';
 import { createOrUpdateStatus, getStatusByTableNo } from '../controllers/statusController.js';
 import upload from '../config/multer.js';
-import { login, logout, signup } from '../controllers/userController.js';
+import { getAllUsers,getAllUsersTodayTimesheet,loginUser,signupUser } from '../controllers/userController.js';
+// import { compareImages, uploadBase64Image, uploadBase64ImageAndCreateUser } from '../controllers/imageController.js';
+// import { compareWithStoredImage } from '../controllers/imageComparisonController.js';
+import multer from 'multer';
 const router = express.Router();
 
 // Route to create multiple dining tables
@@ -44,8 +47,18 @@ router.get('/getAllOrdersAdmin', getAllOrdersAdmin);
 router.put('/updateFoodItemStatus', updateFoodItemStatus);
 router.patch('/updateOrderKotStatus', updateOrderKotStatus);
 
-router.post('/signup', signup);
-router.post('/login', login);
-router.post('/logout', logout);
+router.post('/signup', signupUser);
+router.post('/login', loginUser);
+// router.post('/logout', logoutUser);
+router.get('/alluser', getAllUsers);
+router.get('/alluser-timeSheet', getAllUsersTodayTimesheet);
+
+// router.post('/compare', upload.fields([{ name: 'image1' }, { name: 'image2' }]), compareImages);
+// router.post('/compare', compareImages);
+// router.post('/upload', uploadBase64Image);
+// router.post('/user', uploadBase64ImageAndCreateUser);
+// const upload1 = multer({ dest: 'temp_uploads/' });
+// router.post('/compare-with-stored', upload1.single('image '), compareWithStoredImage);
+// router.post('/compare-with-stored', compareWithStoredImage);
 
 export default router;

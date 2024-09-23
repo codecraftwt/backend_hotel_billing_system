@@ -16,7 +16,7 @@ export const getAllFoodItems = async (req, res) => {
 
 export const getFoodItemsByCategoryId = async (req, res) => {
     const { id  } = req.params;
-    console.log(id ,'categoryId');
+    // console.log(id ,'categoryId');
     
     try {
         const foodItems = await FoodItem.find({ category: id  });
