@@ -17,6 +17,7 @@ const foodItemSchema = new mongoose.Schema({
 const orderSchema = new mongoose.Schema({
     tableNo: { type: Number, required: true },
     customerName: { type: String, default:null },
+    customerNo: { type: Number, default:null },
     ordersList: [foodItemSchema],
     totalPrice: { type: Number, default: 0 },
     discountPercent: { type: Number, default: 0 }, // New field for discount percentage
