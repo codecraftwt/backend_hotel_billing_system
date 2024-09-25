@@ -18,7 +18,7 @@ const server = http.createServer(app);
 const io = new SocketIOServer(server, {
   cors: {
     origin: '*', // Allow Angular frontend
-    methods: ['GET', 'POST','PUT','PATCH'],
+    methods: ['GET', 'POST','PUT','PATCH','DELETE'],
     credentials: true // Allow credentials (cookies, HTTP authentication)
   }
 });
@@ -26,7 +26,7 @@ const io = new SocketIOServer(server, {
 // Middleware to handle CORS
 app.use(cors({
   origin: "*", // Allow requests from Angular frontend
-  methods: ['GET', 'POST','PUT','PATCH'],
+  methods: ['GET', 'POST','PUT','PATCH','DELETE'],
   credentials: true // Allow credentials (cookies, HTTP authentication)
 }));
 

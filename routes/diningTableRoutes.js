@@ -9,6 +9,7 @@ import { getAllUsers,getAllUsersTodayTimesheet,loginUser,signupUser } from '../c
 // import { compareImages, uploadBase64Image, uploadBase64ImageAndCreateUser } from '../controllers/imageController.js';
 // import { compareWithStoredImage } from '../controllers/imageComparisonController.js';
 import multer from 'multer';
+import { createReservation, deleteReservation, getAllReservations, updateReservationStatus } from '../controllers/reservationController.js';
 const router = express.Router();
 
 // Route to create multiple dining tables
@@ -53,7 +54,10 @@ router.post('/login', loginUser);
 // router.post('/logout', logoutUser);
 router.get('/alluser', getAllUsers);
 router.get('/alluser-timeSheet', getAllUsersTodayTimesheet);
-
+router.post('/create-reservation', createReservation);
+router.get('/get-reservations',getAllReservations);
+router.patch('/reservation-status', updateReservationStatus);
+router.delete('/reservation/:id', deleteReservation);
 // router.post('/compare', upload.fields([{ name: 'image1' }, { name: 'image2' }]), compareImages);
 // router.post('/compare', compareImages);
 // router.post('/upload', uploadBase64Image);
