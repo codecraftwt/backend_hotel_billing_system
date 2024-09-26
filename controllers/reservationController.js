@@ -91,7 +91,7 @@ export const deleteReservation = async (req, res) => {
 
 // Update reservation status
 export const updateReservationStatus = async (req, res) => {
-    const { tableNumber, status } = req.body;
+    const { tableNumber,privesStatus, status } = req.body;
   
     if (!tableNumber || !status) {
       return res.status(400).json({ message: 'Table number and status are required' });
@@ -99,7 +99,7 @@ export const updateReservationStatus = async (req, res) => {
   
     try {
       const reservation = await Reservation.findOneAndUpdate(
-        { tableNumber: tableNumber }, // Find reservation by table number
+        { tableNumber: tableNumber ,reservationStatus:privesStatus}, // Find reservation by table number
         { reservationStatus: status }, // Update status
         { new: true } // Return the updated document
       );
