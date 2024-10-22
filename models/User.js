@@ -36,11 +36,10 @@ const timesheetSchema = new mongoose.Schema({
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   usePass: { type: String, required: true },
-  role: { type: String, enum: ['admin', 'user'], default: 'user' },
+  role: { type: [String], enum: ['admin', 'kds'], default: ['kds']},
   timesheet: [timesheetSchema],
 });
 
 const User = mongoose.model('User', userSchema);
 
 export default User;
-
