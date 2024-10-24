@@ -78,68 +78,6 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// // Login: Authenticate user and update timesheet
-// export const loginUser = async (req, res) => {
-//   const { usePass } = req.body;
-
-//   try {
-//     const user = await User.findOne({ usePass });
-//     if (!user) return res.status(404).json({ error: 'User not found' });
-
-//     const today = new Date().setHours(0, 0, 0, 0); // Get today's date at midnight
-//     const timesheetEntry = user.timesheet.find(entry => entry.date.setHours(0, 0, 0, 0) === today);
-
-//     // If no entry exists for today, create one
-//     if (!timesheetEntry) {
-//       user.timesheet.push({
-//         date: new Date(),
-//         checkInTime: new Date(),
-//         status: 'on duty',
-//       });
-//     } else {
-//       // If an entry exists, update checkInTime if not already checked in
-//       if (!timesheetEntry.checkInTime) {
-//         timesheetEntry.checkInTime = new Date();
-//         timesheetEntry.status = 'on duty';
-//       }
-//     }
-
-//     await user.save();
-
-//     req.io.emit('user', user); // Emit user data on login
-//     res.status(200).json(user);
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-
-// // Logout: Update timesheet
-// export const logoutUser = async (req, res) => {
-//   const { usePass } = req.body;
-
-//   try {
-//     const user = await User.findOne({ usePass });
-//     if (!user) return res.status(404).json({ error: 'User not found' });
-
-//     const today = new Date().setHours(0, 0, 0, 0);
-//     const timesheetEntry = user.timesheet.find(entry => entry.date.setHours(0, 0, 0, 0) === today);
-
-//     if (!timesheetEntry || timesheetEntry.status !== 'on duty') {
-//       return res.status(400).json({ error: 'User is not currently logged in' });
-//     }
-
-//     // Update check-out time and status
-//     timesheetEntry.checkOutTime = new Date();
-//     timesheetEntry.status = 'off duty';
-//     await user.save();
-
-//     req.io.emit('user', user); // Emit user data on logout
-//     res.status(200).json(user);
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-
 // Get All Users: Retrieve all users
 export const getAllUsers = async (req, res) => {
   try {

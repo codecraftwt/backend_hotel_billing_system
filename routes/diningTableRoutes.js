@@ -6,8 +6,6 @@ import { addCustomerName, addCustomerNo, createOrUpdateOrder, deleteFoodItem, ge
 import { createOrUpdateStatus, getStatusByTableNo } from '../controllers/statusController.js';
 import upload from '../config/multer.js';
 import { getAllUsers,getAllUsersTodayTimesheet,loginUser,signupUser } from '../controllers/userController.js';
-// import { compareImages, uploadBase64Image, uploadBase64ImageAndCreateUser } from '../controllers/imageController.js';
-// import { compareWithStoredImage } from '../controllers/imageComparisonController.js';
 import multer from 'multer';
 import { createReservation, deleteReservation, getAllReservations, updateReservationStatus } from '../controllers/reservationController.js';
 const router = express.Router();
@@ -27,7 +25,6 @@ router.get('/foodItems',getAllFoodItems)
 router.get('/foodItems/:id',getFoodItemsByCategoryId)
 router.post('/foodItems',upload.single('image'),createFoodItem)
 
-
 router.post('/orders', createOrUpdateOrder);
 router.get('/orders/:tableNo', getOrderByTableNo);
 router.put('/updateFoodItemQuantity', updateFoodItemQuantity);
@@ -39,7 +36,6 @@ router.patch('/add-customer-name', addCustomerName);
 router.patch('/add-customer-number', addCustomerNo);
 router.patch('/update-payment-type', updatePaymentType);
 router.patch('/orders/updateStatus', updateOrderStatus);
-
 
 router.put('/status', createOrUpdateStatus);
 router.get('/status/:tableNo', getStatusByTableNo);
@@ -58,12 +54,5 @@ router.post('/create-reservation', createReservation);
 router.get('/get-reservations',getAllReservations);
 router.patch('/reservation-status', updateReservationStatus);
 router.delete('/reservation/:id', deleteReservation);
-// router.post('/compare', upload.fields([{ name: 'image1' }, { name: 'image2' }]), compareImages);
-// router.post('/compare', compareImages);
-// router.post('/upload', uploadBase64Image);
-// router.post('/user', uploadBase64ImageAndCreateUser);
-// const upload1 = multer({ dest: 'temp_uploads/' });
-// router.post('/compare-with-stored', upload1.single('image '), compareWithStoredImage);
-// router.post('/compare-with-stored', compareWithStoredImage);
 
 export default router;

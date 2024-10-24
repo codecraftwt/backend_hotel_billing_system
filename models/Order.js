@@ -20,11 +20,11 @@ const orderSchema = new mongoose.Schema({
     customerNo: { type: Number, default:null },
     ordersList: [foodItemSchema],
     totalPrice: { type: Number, default: 0 },
-    discountPercent: { type: Number, default: 0 }, // New field for discount percentage
-    afterDiscountPrice: { type: Number, default: 0 }, // New field for price after discount
-    paymentType: { type: String, default: null }, // New field for payment type
-    orderStatus: { type: String, default: 'processing', enum: ['processing', 'completed'] }, // New field
-    kotStatus: { type: String, default: null, enum: ['null', 'confirmed'] } // Added kotStatus field
+    discountPercent: { type: Number, default: 0 }, 
+    afterDiscountPrice: { type: Number, default: 0 }, 
+    paymentType: { type: String, default: null }, 
+    orderStatus: { type: String, default: 'processing', enum: ['processing', 'completed'] }, 
+    kotStatus: { type: String, default: null, enum: ['null', 'confirmed'] } 
 },{ timestamps: true });
 
 // Calculate total price before saving

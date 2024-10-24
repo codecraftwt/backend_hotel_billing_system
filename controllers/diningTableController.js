@@ -4,8 +4,6 @@ import Order from '../models/Order.js';
 // Controller to handle table updates
 export const updateTables = async (req, res) => {
   try {
-    // Process the request (e.g., add, update, remove tables)
-    // Example: Add new tables
     const tables = req.body;
     await DiningTable.insertMany(tables);
 
@@ -36,11 +34,6 @@ export const getDiningTables = async (req, res) => {
             tableNumber: table.tableNumber,
             capacity: table.capacity,
             status: table.status,
-            // order: {
-            //   _id: table.order._id,
-            //   totalPrice: table.order.totalPrice,
-            //   orderStatus: table.order.orderStatus
-            // }
             order:table.order
           };
         }
@@ -94,8 +87,6 @@ export const updateTableWithOrder = async (req, res) => {
     // Emit the updated table to all clients
     const updatedTables = await DiningTable.find();
     req.io.emit('updateTables', updatedTables);
-    // req.io.emit('updateTables', updatedTable);
-
     res.status(200).json(updatedTable);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -120,8 +111,6 @@ export const updateTableStatus=async (req,res)=>{
     if (!diningTable) {
       return res.status(404).send('Dining table not found');
     }
-
-    // res.status(200).json(diningTable);
     const updatedTables = await DiningTable.find();
     req.io.emit('updateTables', updatedTables);
     res.status(201).json(updatedTables);

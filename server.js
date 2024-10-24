@@ -3,7 +3,7 @@ import http from 'http';
 import mongoose from 'mongoose';
 import router from './routes/diningTableRoutes.js';
 import { Server as SocketIOServer } from 'socket.io';
-import cors from 'cors'; // Import cors package
+import cors from 'cors'; 
 import connectDB from './config/db.js';
 import dotenv from 'dotenv';
 import * as faceRecognitionService from './services/faceRecognitionService.js';

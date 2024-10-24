@@ -1,7 +1,5 @@
 import Reservation from '../models/Reservation.js';
 
-// Create a new reservation
-// Create a new reservation
 export const createReservation = async (req, res) => {
     const { reservationName, numberOfPeople, tableNumber, userPhoneNumber, reservationDateTime } = req.body.data;
   console.log(req.body,'req.body');
@@ -30,15 +28,6 @@ export const createReservation = async (req, res) => {
   };
   
 
-// Get all reservations
-// export const getAllReservations = async (req, res) => {
-//   try {
-//     const reservations = await Reservation.find({reservationStatus:'processing'});
-//     res.status(200).json(reservations);
-//   } catch (error) {
-//     res.status(500).json({ message: 'Error fetching reservations', error });
-//   }
-// };
 export const getAllReservations = async (req, res) => {
     try {
       const today = new Date();
