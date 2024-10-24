@@ -44,6 +44,10 @@ app.use(express.json({ limit: '50mb' })); // Adjust the limit as needed
 app.use(express.urlencoded({ extended: true, limit: '50mb' })); // For URL-encoded data
 
 // Routes
+app.get('/', (req, res) => {
+  res.send("Hello, there!! this is Hotel Billing server backend");
+});
+
 app.use('/api', router);
 
 // Socket.IO connection
