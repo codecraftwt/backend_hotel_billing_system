@@ -422,6 +422,76 @@ export const getAllOrdersAdmin = async (req, res) => {
 
 
 // New API to update discount percentage
+
+export const getAllOrdersAdminGraph = async (req, res) => {
+    try {
+        // Fetch all orders
+        const orders = await Order.find();
+
+        // Helper functions
+        const getMonthlyData = (start, end) => {
+            return orders.filter(order => 
+                new Date(order.createdAt) >= start && new Date(order.createdAt) <= end
+            );
+        };
+
+        const getTotalRevenue = (orders) => orders.reduce((sum, order) => sum + order.afterDiscountPrice, 0);
+
+        const getTotalCustomers = (orders) => orders.reduce((sum, order) => sum + (order.customerNo || 0), 0);
+
+        const averageOrderValue = (total, count) => count === 0 ? 0 : total / count;
+
+        // Get the list of all months present in the data
+        const getAllMonths = (orders) => {
+            const months = [];
+            orders.forEach(order => {
+                const month = new Date(order.createdAt);
+                if (!months.some(m => m.getFullYear() === month.getFullYear() && m.getMonth() === month.getMonth())) {
+                    months.push(month);
+                }
+            });
+            return months.sort((a, b) => a - b); // Sort months in ascending order
+        };
+
+        const months = getAllMonths(orders);
+
+        // Initialize the order data for each metric
+        const orderData = {
+            totalOrders: [],
+            totalCustomers: [],
+            revenue: [],
+            averageOrderValue: [],
+        };
+
+        // Loop through each month and calculate the totals for each metric
+        months.forEach(month => {
+            const startOfMonth = new Date(month.getFullYear(), month.getMonth(), 1);
+            const endOfMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+
+            const monthlyOrders = getMonthlyData(startOfMonth, endOfMonth);
+            const monthlyRevenue = getTotalRevenue(monthlyOrders);
+            const monthlyCustomers = getTotalCustomers(monthlyOrders);
+            const avgOrderValue = averageOrderValue(monthlyRevenue, monthlyOrders.length);
+
+            orderData.totalOrders.push({ x: startOfMonth, y: monthlyOrders.length });
+            orderData.totalCustomers.push({ x: startOfMonth, y: monthlyCustomers });
+            orderData.revenue.push({ x: startOfMonth, y: monthlyRevenue });
+            orderData.averageOrderValue.push({ x: startOfMonth, y: avgOrderValue });
+        });
+
+        // Send response with the order data
+        res.status(200).json({
+            totalOrders: orderData.totalOrders,
+            totalCustomers: orderData.totalCustomers,
+            revenue: orderData.revenue,
+            averageOrderValue: orderData.averageOrderValue,
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
 export const updateDiscountPercent = async (req, res) => {
     const { tableNo, discountPercent  } = req.body;
 
