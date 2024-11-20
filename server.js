@@ -7,7 +7,6 @@ import cors from 'cors';
 import connectDB from './config/db.js';
 import dotenv from 'dotenv';
 import * as faceRecognitionService from './services/faceRecognitionService.js';
-// Load environment variables from .env file
 dotenv.config();
 
 const app = express();
@@ -38,10 +37,8 @@ app.use((req, res, next) => {
 
 // Connect to MongoDB
 connectDB()
-// Middleware
-// app.use(express.json());
-app.use(express.json({ limit: '50mb' })); // Adjust the limit as needed
-app.use(express.urlencoded({ extended: true, limit: '50mb' })); // For URL-encoded data
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Routes
 app.get('/', (req, res) => {

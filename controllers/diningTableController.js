@@ -7,7 +7,6 @@ export const updateTables = async (req, res) => {
     const tables = req.body;
     await DiningTable.insertMany(tables);
 
-    // Emit the updated list of tables to all clients
     const updatedTables = await DiningTable.find();
     req.io.emit('updateTables', updatedTables);
 
@@ -20,14 +19,10 @@ export const updateTables = async (req, res) => {
 // Controller to get all dining tables
 export const getDiningTables = async (req, res) => {
   try {
-    // Fetch all dining tables and populate the 'order' field
     const tables = await DiningTable.find().populate('order');
     
-    // Transform the data
     const filteredTables = tables.map(table => {
-      // Check if there's an associated order
       if (table.order) {
-        // Only include tables with an order that has status 'processing'
         if (table.order.orderStatus === 'processing' && table.order.kotStatus=="confirmed") {
           return {
             _id: table._id,
@@ -38,7 +33,6 @@ export const getDiningTables = async (req, res) => {
           };
         }
       }
-      // Return table with null order if no processing order
       return {
         _id: table._id,
         tableNumber: table.tableNumber,
@@ -48,32 +42,27 @@ export const getDiningTables = async (req, res) => {
       };
     });
 
-    // Respond with the transformed tables
     res.status(200).json(filteredTables);
   } catch (error) {
-    // Handle errors
     console.error('Error fetching dining tables:', error.message);
     res.status(500).json({ error: 'An error occurred while fetching dining tables.' });
   }
 };
 
 export const updateTableWithOrder = async (req, res) => {
-  const { tableNumber } = req.params; // Assuming tableNumber is used to identify the table
+  const { tableNumber } = req.params; 
   const { orderId } = req.body;
 
   try {
-    // Check if the order exists
     const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Check if the order's tableNo matches the tableNumber
     if (order.tableNo !== parseInt(tableNumber, 10)) {
       return res.status(400).json({ message: 'Order tableNo does not match the tableNumber' });
     }
 
-    // Update the DiningTable with the orderId
     const updatedTable = await DiningTable.findOneAndUpdate(
       { tableNumber },
       { order: orderId },
@@ -84,7 +73,6 @@ export const updateTableWithOrder = async (req, res) => {
       return res.status(404).json({ message: 'Dining table not found' });
     }
 
-    // Emit the updated table to all clients
     const updatedTables = await DiningTable.find();
     req.io.emit('updateTables', updatedTables);
     res.status(200).json(updatedTable);

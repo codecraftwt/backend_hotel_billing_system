@@ -4,12 +4,9 @@ export const createReservation = async (req, res) => {
     const { reservationName, numberOfPeople, tableNumber, userPhoneNumber, reservationDateTime } = req.body.data;
   console.log(req.body,'req.body');
   
-    // Simple validation
     if (!reservationName || !numberOfPeople || !tableNumber || !userPhoneNumber || !reservationDateTime) {
       return res.status(400).json({ message: 'All fields are required' });
     }
-  
-    // Create the reservation
     try {
       const reservation = new Reservation({
         reservationName,
@@ -31,14 +28,12 @@ export const createReservation = async (req, res) => {
 export const getAllReservations = async (req, res) => {
     try {
       const today = new Date();
-      // Set the start and end of today
       const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
       const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
   
-      // Query for reservations with status 'processing' and today's date
       const reservations = await Reservation.find({
         reservationStatus: 'processing',
-        reservationDateTime: { $gte: startOfDay, $lt: endOfDay } // Use reservationDateTime here
+        reservationDateTime: { $gte: startOfDay, $lt: endOfDay } 
       });
   
       res.status(200).json(reservations);
@@ -69,7 +64,6 @@ export const deleteReservation = async (req, res) => {
     }
     const reservations = await Reservation.find({
         reservationStatus: 'processing',
-        // Use reservationDateTime here
       });
       req.io.emit('reservation', reservation);
     res.status(200).json({ message: 'Reservation deleted successfully' });
@@ -88,9 +82,9 @@ export const updateReservationStatus = async (req, res) => {
   
     try {
       const reservation = await Reservation.findOneAndUpdate(
-        { tableNumber: tableNumber ,reservationStatus:privesStatus}, // Find reservation by table number
-        { reservationStatus: status }, // Update status
-        { new: true } // Return the updated document
+        { tableNumber: tableNumber ,reservationStatus:privesStatus},
+        { reservationStatus: status },
+        { new: true } 
       );
   
       if (!reservation) {

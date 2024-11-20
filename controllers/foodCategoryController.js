@@ -10,26 +10,21 @@ export const getAllCategories = async (req, res) => {
 };
 
 export const createCategory = async (req, res) => {
-    const { name } = req.body;  // Extract name from the request body
+    const { name } = req.body; 
     try {
-        // Ensure that the name is a string and properly format it
         if (!name || typeof name !== 'string') {
             return res.status(400).json({ message: 'Invalid name' });
         }
 
-        // Create a new category object
         const newCategory = new FoodCategory({ name });
 
-        // Use insertMany() to insert the new category into the database
-        await FoodCategory.insertMany([newCategory]); // Insert as an array with one object
+        await FoodCategory.insertMany([newCategory]);
 
         // Retrieve updated categories from the database
         const updatedFoodCategory = await FoodCategory.find();
 
-        // Emit the new category to all connected clients
         req.io.emit('newCategory', updatedFoodCategory);
 
-        // Send the updated list of categories in the response
         res.status(201).json(updatedFoodCategory);
     } catch (error) {
         res.status(400).json({ message: error.message });

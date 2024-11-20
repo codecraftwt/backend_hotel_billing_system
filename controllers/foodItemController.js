@@ -5,7 +5,7 @@ import FoodItem from "../models/FoodItem.js";
 export const getAllFoodItems = async (req, res) => {
     try {
         const foodItems = await FoodItem.find()
-            .populate('category', 'name') // Populate category field with its name
+            .populate('category', 'name') 
             .exec();
 
         res.json(foodItems);
@@ -16,12 +16,10 @@ export const getAllFoodItems = async (req, res) => {
 
 export const getFoodItemsByCategoryId = async (req, res) => {
     const { id } = req.params;
-    // console.log(id ,'categoryId');
 
     try {
         const foodItems = await FoodItem.find({ category: id });
 
-        // If no food items are found, return an empty array
         if (!foodItems.length) {
             return res.json([]);
         }
@@ -34,24 +32,20 @@ export const getFoodItemsByCategoryId = async (req, res) => {
 
 export const createFoodItem = async (req, res) => {
     const { name, category, price, type, shortcode } = req.body;
-    const image = req.file; // Assuming the image field name is 'image'
-    console.log(category, 'category');
+    const image = req.file; 
 
     try {
-        // Find the category by name
         const categoryDoc = await FoodCategory.findOne({ _id: category });
         if (!categoryDoc) {
             return res.status(400).json({ message: 'Category not found' });
         }
 
-        // Upload the image to Cloudinary if provided
         let imgUrl = null;
         if (image) {
             const result = await cloudinary.uploader.upload(image.path);
             imgUrl = result.secure_url;
         }
 
-        // Create the new food item using the category ID and image URL
         const newFoodItem = new FoodItem({
             name,
             category: categoryDoc._id,
@@ -64,7 +58,6 @@ export const createFoodItem = async (req, res) => {
         await newFoodItem.save();
         const updatedFoodItems = await FoodItem.find();
 
-        // Emit the new food item to all connected clients
         if (req.io) {
             req.io.emit('newFoodItem', updatedFoodItems);
         }

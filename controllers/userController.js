@@ -10,21 +10,20 @@ export const signupUser = async (req, res) => {
       return res.status(400).json({ error: 'Username already exists' });
     }
 
-    // Create a new user with a default timesheet entry
     const newUser = new User({
       username,
       usePass,
       role,
       timesheet: [{
-        date: new Date(), // Set the date to today
+        date: new Date(), 
         checkInTime: null,
         checkOutTime: null,
-        status: 'off duty' // Default status
+        status: 'off duty'
       }]
     });
     
     await newUser.save();
-    req.io.emit('user', newUser); // Emit the new user data
+    req.io.emit('user', newUser);
     res.status(201).json({ message: 'User created successfully', username });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -39,11 +38,10 @@ export const loginUser = async (req, res) => {
     const user = await User.findOne({ usePass });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    const today = new Date().setHours(0, 0, 0, 0); // Get today's date at midnight
+    const today = new Date().setHours(0, 0, 0, 0);
     const timesheetEntry = user.timesheet.find(entry => entry.date.setHours(0, 0, 0, 0) === today);
 
     if (!timesheetEntry) {
-      // If no entry exists for today, create one and log the user in
       user.timesheet.push({
         date: new Date(),
         checkInTime: new Date(),
@@ -51,25 +49,22 @@ export const loginUser = async (req, res) => {
       });
       await user.save();
 
-      req.io.emit('user', user); // Emit user data on login
+      req.io.emit('user', user);
       return res.status(200).json(user);
     } else {
-      // If an entry exists, check the status
       if (timesheetEntry.status === 'on duty') {
-        // User is already on duty, log them out
         timesheetEntry.checkOutTime = new Date();
         timesheetEntry.status = 'off duty';
         await user.save();
 
-        req.io.emit('user', user); // Emit user data on logout
+        req.io.emit('user', user); 
         return res.status(200).json(user);
       } else {
-        // User is off duty, log them in
         timesheetEntry.checkInTime = new Date();
         timesheetEntry.status = 'on duty';
         await user.save();
 
-        req.io.emit('user', user); // Emit user data on login
+        req.io.emit('user', user);
         return res.status(200).json(user);
       }
     }
@@ -93,7 +88,6 @@ export const getAllUsersTodayTimesheet = async (req, res) => {
   try {
     const users = await User.find();
 
-    // Get today's date dynamically
     const today = new Date();
     // today.setDate(today.getDate() + 2);
     const todayStart = new Date(today.setHours(0, 0, 0, 0)); // Start of today
@@ -114,7 +108,7 @@ export const getAllUsersTodayTimesheet = async (req, res) => {
           checkOutTime: null,
           status: 'off duty'
         });
-        user.save(); // Save the updated user document
+        user.save(); 
         req.io.emit('user', user);
 
       }

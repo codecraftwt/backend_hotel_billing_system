@@ -5,28 +5,23 @@ export const createOrUpdateStatus = async (req, res) => {
     const { tableNo, status } = req.body;
 
     try {
-        // Find the existing status
         let existingStatus = await Status.findOne({ tableNo });
 
-        // If status does not exist, create a new one
         if (!existingStatus) {
             existingStatus = new Status({ tableNo, status });
         } else {
-            // Update existing status
             existingStatus.status = status;
         }
 
-        // If status is 'gray', check if any orders exist
         if (status === 'gray') {
             const orderExists = await Order.exists({ tableNo });
             if (orderExists) {
-                existingStatus.status = 'gray'; // Ensure status remains 'gray'
+                existingStatus.status = 'gray'; 
             }
         }
 
         await existingStatus.save();
 
-        // Emit the updated status using Socket.IO
         req.io.emit('statusUpdated', { tableNo, status: existingStatus.status });
 
         res.status(200).json({ message: 'Status updated successfully', status: existingStatus.status });

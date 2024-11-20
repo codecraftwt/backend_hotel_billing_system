@@ -1,9 +1,4 @@
 import mongoose from 'mongoose';
-
-// Import the Order model
-// import Order from './path-to-order-model.js';
-import Order from './Order.js';
-
 const DiningTableSchema = new mongoose.Schema({
   tableNumber: { type: Number, required: true, unique: true },
   capacity: { type: Number, required: true },
