@@ -120,6 +120,7 @@ export const getAllUsersTodayTimesheet = async (req, res) => {
       });
 
       return {
+        _id:user._id,
         username: user.username,
         role:user.role,
         todayTimesheet
@@ -133,4 +134,85 @@ export const getAllUsersTodayTimesheet = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Update User Role: Update the role of an existing user
+export const updateUserRole = async (req, res) => {
+  const { _id, newRole } = req.body;
+
+  // Validate newRole
+  const validRoles = ['admin', 'kds', 'counter'];  // Define the possible roles
+  if (!validRoles.includes(newRole)) {
+    return res.status(400).json({ error: 'Invalid role provided' });
+  }
+
+  try {
+    // Find the user by username
+    const user = await User.findOne({ _id });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Update the user's role
+    user.role = [newRole];  // Assuming the role is an array of roles, update it
+
+    // Save the updated user
+    await user.save();
+
+    // Emit the updated user to connected clients
+    req.io.emit('user', user);
+
+    // Send the response
+    res.status(200).json({ message: 'User role updated successfully', user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Delete User: Remove a user by ID
+export const deleteUser = async (req, res) => {
+  const { _id } = req.params; // Assuming `_id` is passed as a route parameter
+
+  try {
+    // Find and delete the user
+    const deletedUser = await User.findByIdAndDelete(_id);
+
+    if (!deletedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Emit the updated user data to connected clients
+    req.io.emit('user', { action: 'delete', _id });
+
+    res.status(200).json({ message: 'User deleted successfully', user: deletedUser });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+// import User from '../models/User.js';
+
+// Signup: Check for 4-digit password
+export const checkPassword = async (req, res) => {
+  const { usePass } = req.body;  // Only `usePass` is passed in the request body
+
+  // Validate that the password is a 4-digit number
+  const passwordPattern = /^\d{4}$/; // Regex to check for exactly 4 digits
+  if (!passwordPattern.test(usePass)) {
+    return res.status(400).json({ error: 'Password must be a 4-digit number' });
+  }
+
+  try {
+    // Check if the password already exists in the database
+    const existingUser = await User.findOne({ usePass });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Password already exists' });
+    }
+
+    // If the password does not exist, return success message
+    res.status(200).json({ message: 'Password is available for registration' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 

@@ -5,7 +5,7 @@ import { createFoodItem, getAllFoodItems, getFoodItemsByCategoryId } from '../co
 import { addCustomerName, addCustomerNo, createOrUpdateOrder, deleteFoodItem, getAllOrders, getAllOrdersAdmin, getAllOrdersAdminGraph, getOrderByTableNo, updateDiscountPercent, updateFoodItemQuantity, updateFoodItemStatus, updateOrderKotStatus, updateOrderNote, updateOrderStatus, updatePaymentType } from '../controllers/orderController.js';
 import { createOrUpdateStatus, getStatusByTableNo } from '../controllers/statusController.js';
 import upload from '../config/multer.js';
-import { getAllUsers,getAllUsersTodayTimesheet,loginUser,signupUser } from '../controllers/userController.js';
+import { checkPassword, deleteUser, getAllUsers,getAllUsersTodayTimesheet,loginUser,signupUser, updateUserRole } from '../controllers/userController.js';
 import multer from 'multer';
 import { createReservation, deleteReservation, getAllReservations, updateReservationStatus } from '../controllers/reservationController.js';
 const router = express.Router();
@@ -48,6 +48,10 @@ router.patch('/updateOrderKotStatus', updateOrderKotStatus);
 
 router.post('/signup', signupUser);
 router.post('/login', loginUser);
+router.post('/check-pass', checkPassword);
+router.patch('/update-role',updateUserRole);
+router.delete('/users/:_id', deleteUser);
+
 // router.post('/logout', logoutUser);
 router.get('/alluser', getAllUsers);
 router.get('/alluser-timeSheet', getAllUsersTodayTimesheet);
