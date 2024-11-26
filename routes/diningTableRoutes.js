@@ -1,7 +1,7 @@
 import express from 'express';
 import {getDiningTables, updateTables, updateTableStatus, updateTableWithOrder } from '../controllers/diningTableController.js';
 import { createCategory, getAllCategories } from '../controllers/foodCategoryController.js';
-import { createFoodItem, getAllFoodItems, getFoodItemsByCategoryId } from '../controllers/foodItemController.js';
+import { createFoodItem, getAllFoodItems, getFoodItemsByCategoryId, updateFoodItem } from '../controllers/foodItemController.js';
 import { addCustomerName, addCustomerNo, createOrUpdateOrder, deleteFoodItem, getAllOrders, getAllOrdersAdmin, getAllOrdersAdminGraph, getOrderByTableNo, updateDiscountPercent, updateFoodItemQuantity, updateFoodItemStatus, updateOrderKotStatus, updateOrderNote, updateOrderStatus, updatePaymentType } from '../controllers/orderController.js';
 import { createOrUpdateStatus, getStatusByTableNo } from '../controllers/statusController.js';
 import upload from '../config/multer.js';
@@ -21,9 +21,10 @@ router.patch('/tables/:tableNumber/status', updateTableStatus);
 router.get('/foodCategory',getAllCategories)
 router.post('/foodCategory',createCategory)
 
-router.get('/foodItems',getAllFoodItems)
-router.get('/foodItems/:id',getFoodItemsByCategoryId)
-router.post('/foodItems',upload.single('image'),createFoodItem)
+router.get('/foodItems',getAllFoodItems);
+router.get('/foodItems/:id',getFoodItemsByCategoryId);
+router.post('/foodItems',upload.single('image'),createFoodItem);
+router.put('/foodItems/:id', upload.single('image'),updateFoodItem);
 
 router.post('/orders', createOrUpdateOrder);
 router.get('/orders/:tableNo', getOrderByTableNo);
